@@ -95,15 +95,21 @@ class BotMessage:
     text: str  # 机器人回复的内容（当下用的属性）
     object: FocusedObject | None = None  # 后续扩展集成的属性
 
-
-    def  to_dict(self)->dict[str,Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "text": self.text,
             "object": FocusedObject.to_dict(self.object) if self.object is not None else None
         }
+
     @classmethod
-    def  from_dict(cls,data:dict[str,Any])->"BotMessage":
-        return  cls(
+    def from_dict(cls, data: dict[str, Any]) -> "BotMessage":
+        return cls(
             text=data['text'],
             object=FocusedObject.from_dict(data['object']) if data['object'] is not None else None
         )
+
+
+@dataclass(slots=True)
+class ProcessedResult:
+    message_id: str
+    messages: list[BotMessage]

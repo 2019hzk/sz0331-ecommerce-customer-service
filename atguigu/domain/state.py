@@ -324,4 +324,3 @@ class DialogueState:
         self.focused_object = object
 
 
-

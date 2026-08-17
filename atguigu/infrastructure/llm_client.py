@@ -7,7 +7,6 @@
 """
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import AIMessage
 from langchain_core.output_parsers import StrOutputParser
 
 from atguigu.config.settings import settings

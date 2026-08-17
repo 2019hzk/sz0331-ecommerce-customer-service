@@ -6,7 +6,7 @@
 """
 import asyncio
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncConnection, async_sessionmaker, AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker, AsyncEngine
 from sqlalchemy import text
 from atguigu.config.settings import settings
 
