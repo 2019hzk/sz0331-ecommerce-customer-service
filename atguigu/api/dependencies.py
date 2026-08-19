@@ -12,10 +12,10 @@ from atguigu.repository.dialogue_repository import DialogueRepository
 from atguigu.services.dialogue_service import DialogueStateService
 from atguigu.infrastructure.db_client import session_factory  # 有坑  模块下的成员
 from atguigu.infrastructure import  db_client                   # 包下面的模块 可以的
-
+from  atguigu.engines.builder import  build_dialogue_engine
 
 def get_dialogue_engine():
-    return DialogueEngine()
+    return build_dialogue_engine()
 
 
 DialogueEngineDep = Annotated[DialogueEngine, Depends(get_dialogue_engine)]
