@@ -6,6 +6,7 @@ from atguigu.domain.messages import ProcessedResult, BotMessage, UserMessage, Me
 from atguigu.domain.state import DialogueState
 from atguigu.knowledge.handler import KnowledgeHandler
 from atguigu.plan.planner import TurnPlanner
+from atguigu.plan.turn_plan import TurnPlan
 from atguigu.plan.validator import TurnPlanValidator
 from atguigu.task.handler import TaskHandler
 
@@ -109,22 +110,28 @@ class DialogueEngine:
         职责：处理文本消息类型（llm进行路由分析，规划轨道）
         Args:
             dialogue_state:
-
         Returns:
-
         """
-
         # 1. 利用轮次规划器进行路由分析
-        predict_result = await self.turn_planner.predict(dialogue_state)
+        turn_plan: TurnPlan = await self.turn_planner.predict(dialogue_state,
+                                                              flow_list=self.task_handler.flow_list)
 
         # 2. 利用轮次结果校验器校验轮次规划后的结果
-        validated = self.turn_plan_validator.valid(predict_result, dialogue_state)
-
-        # 3. 校验失败
-        if not validated:
-            return await self.clarify_responder.respond(validated, dialogue_state)
-
-        # 4. 校验成功(到底是哪一条轨道，进入到该轨道内部去执行对应的轨道内逻辑【xxxHandler】)
+        # validated = self.turn_plan_validator.valid(turn_plan, dialogue_state)
+        #
+        # # 3. 校验失败
+        # if not validated:
+        #     return await self.clarify_responder.respond(validated, dialogue_state)
+        #
+        # # 4. 校验成功(到底是哪一条轨道，进入到该轨道内部去执行对应的轨道内逻辑【xxxHandler】)
+        # if turn_plan.task is not None:
+        #     return self.task_handler.handle(turn_plan.task.commands)
+        # elif turn_plan.knowledge is not None:
+        #     return self.knowledge_handler.handle()
+        # elif turn_plan.chitchat is not None:
+        #     return self.chitchat_handler.handle()
+        # else:
+        #     pass
 
         # 5. 直接返回机器回复的消息
         return [BotMessage(text="你好，我是客服助手")]
