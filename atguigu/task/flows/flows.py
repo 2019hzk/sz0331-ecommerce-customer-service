@@ -39,4 +39,13 @@ class FlowList:
     slots: dict[str, FlowSlot] = field(default_factory=dict)     # 字典key是槽位的名字
 
 
+    def  get_flow_by_id(self,flow_id)->Flow | None:
+
+        for flow in self.flows:
+            if flow.id==flow_id:
+                return  flow
+
+        return  None
+
+
 

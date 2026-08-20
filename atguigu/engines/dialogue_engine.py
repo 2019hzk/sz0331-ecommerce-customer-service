@@ -114,15 +114,19 @@ class DialogueEngine:
         """
         # 1. 利用轮次规划器进行路由分析
         turn_plan: TurnPlan = await self.turn_planner.predict(dialogue_state,
-                                                              flow_list=self.task_handler.flow_list)
+                                                              flow_list=self.task_handler.flow_list,
+                                                              knowledge_intents=self.knowledge_handler.knowledge_intents)
 
         # 2. 利用轮次结果校验器校验轮次规划后的结果
-        # validated = self.turn_plan_validator.valid(turn_plan, dialogue_state)
-        #
+        validated = self.turn_plan_validator.valid(turn_plan,
+                                                   dialogue_state,
+                                                   flow_list=self.task_handler.flow_list,
+                                                   knowledge_intents=self.knowledge_handler.knowledge_intents
+                                                   )
         # # 3. 校验失败
-        # if not validated:
-        #     return await self.clarify_responder.respond(validated, dialogue_state)
-        #
+        if not validated.valid:
+            return await self.clarify_responder.respond(validated.reason, dialogue_state)
+
         # # 4. 校验成功(到底是哪一条轨道，进入到该轨道内部去执行对应的轨道内逻辑【xxxHandler】)
         # if turn_plan.task is not None:
         #     return self.task_handler.handle(turn_plan.task.commands)

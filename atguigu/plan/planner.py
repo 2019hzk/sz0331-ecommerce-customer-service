@@ -7,6 +7,7 @@ from langchain_core.output_parsers import JsonOutputParser
 
 from atguigu.domain.contexts import TaskContext
 from atguigu.domain.state import DialogueState
+from atguigu.knowledge.intents import KnowledgeIntent
 from atguigu.plan.turn_plan import TurnPlan
 from atguigu.prompt.loader import load_prompt_template_content
 from atguigu.infrastructure.llm_client import llm_client
@@ -18,8 +19,9 @@ class TurnPlanner:
     async def predict(self,
                       dialogue_state: DialogueState,
                       *,
-                      flow_list: FlowList
-                      )->TurnPlan:
+                      flow_list: FlowList,
+                      knowledge_intents: dict[str, KnowledgeIntent]
+                      ) -> TurnPlan:
         """
         职责：利用轮次规划器进行路由分析
         Args:
@@ -31,7 +33,9 @@ class TurnPlanner:
 
         # 1. 构建LLM执行路由分析时需要的提示词模版中变量的内容
 
-        prompt_inputs: dict[str, Any] = self._build_prompt_inputs(dialogue_state, flow_list=flow_list)
+        prompt_inputs: dict[str, Any] = self._build_prompt_inputs(dialogue_state,
+                                                                  flow_list=flow_list,
+                                                                  knowledge_intents=knowledge_intents)
 
         # 2. 调用LLM
         llm_result = await self._invoke(prompt_inputs)
@@ -42,7 +46,8 @@ class TurnPlanner:
     def _build_prompt_inputs(self,
                              state: DialogueState,
                              *,
-                             flow_list: FlowList
+                             flow_list: FlowList,
+                             knowledge_intents: dict[str, KnowledgeIntent]
                              ) -> dict[str, Any]:
         user_message_str = ChatHistoryBuilder.build_user_message_str(state.pending_turn.user_message)
         current_conversation_str = ChatHistoryBuilder.build(state.current_session().turns[-10:])
@@ -62,7 +67,9 @@ class TurnPlanner:
             ]
         }, ensure_ascii=False)
 
-        knowledge_intents_json = ""  # 知识意图清单
+        knowledge_intents_json = json.dumps([{"id": intent_id, "description": knowledge_intent.description} for
+                                             intent_id, knowledge_intent in knowledge_intents.items()],
+                                            ensure_ascii=False)
 
         return {
             "user_message": user_message_str,
@@ -72,7 +79,6 @@ class TurnPlanner:
             "active_task_json": active_task_json,
             "available_flows_json": available_flows_json,
             "knowledge_intents_json": knowledge_intents_json
-
         }
 
     async def _invoke(self, prompt_inputs: dict[str, Any]) -> TurnPlan:
