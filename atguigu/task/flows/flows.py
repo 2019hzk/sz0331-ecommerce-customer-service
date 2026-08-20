@@ -27,6 +27,14 @@ class Flow:
     slots: dict[str,FlowSlot]=field(default_factory=dict)   # slots 是后续给LLM来帮助我们填写槽位的时候，作为参考
 
 
+    def get_step_by_id(self,step_id:str)->FlowStep | None:
+        for step in self.steps:
+            if step.id==step_id:
+                return  step
+
+        return  None
+
+
 
 
 
