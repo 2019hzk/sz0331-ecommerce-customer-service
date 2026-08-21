@@ -185,21 +185,18 @@ class CommandProcessor:
         else:
             resumed = state.resume_task(resumed_flow_id)
             if not resumed:
-                # a) 回滚 把刚刚压入到栈中的当前执行的业务流程上下文恢复出来
-                state.resume_task()
-
-                # b) 激活恢复失败的系统流程
+                # a) 激活恢复失败的系统流程
                 state.start_system_task(SystemTaskResumeFailedContext(
                     flow_id="system_task_resume_failed",
                     step_id="start"
                 ))
             else:
-                # c) 激活恢复成功系统流程
+                # b) 激活恢复成功系统流程
                 state.start_system_task(SystemTaskResumedContext(
                     flow_id="system_task_resumed",
                     step_id="start",
                     resumed_flow_id=state.active_task.flow_id,
-                    resumed_flow_name=flow_list.get_flow_by_id(resumed_flow_id).name
+                    resumed_flow_name=flow_list.get_flow_by_id(state.active_task.flow_id).name
                 ))
 
     def _cancel_flow(self,
