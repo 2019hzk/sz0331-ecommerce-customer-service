@@ -164,7 +164,7 @@ class DialogueState:
         # 2. 将当前正在执行的业务流程清空掉
         self.active_task = None
 
-    def resume_task(self, flow_id: str | None) -> bool:
+    def resume_task(self, flow_id: str | None=None) -> bool:
         """
         职责：恢复暂停业务流程任务栈中的业务流程任务
         Args:

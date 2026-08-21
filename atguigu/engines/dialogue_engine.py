@@ -140,13 +140,8 @@ class DialogueEngine:
             return await self.task_handler.handle(turn_plan.task.commands, dialogue_state)
         elif turn_plan.knowledge is not None:
             return await self.knowledge_handler.handle(turn_plan.knowledge.intents, dialogue_state)
-        elif turn_plan.chitchat is not None:
-            return await self.chitchat_handler.handle(turn_plan.chitchat.chat, dialogue_state)
         else:
-            pass
-
-        # 5. 直接返回机器回复的消息
-        return [BotMessage(text="你好，我是客服助手")]
+            return await self.chitchat_handler.handle(turn_plan.chitchat.chat, dialogue_state)
 
     async def _handle_object_message(self,
                                      object: FocusedObject,
